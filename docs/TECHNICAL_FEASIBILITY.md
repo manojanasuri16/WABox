@@ -30,6 +30,7 @@ instead.
 | Widget manual refresh | **Feasible** | `ActionCallback` → `RefreshWorker` |
 | Per-widget configuration | **Feasible** | Glance per-widget preferences state + configuration activity. Reconfiguration on API 31+. |
 | Widget reboot survival | **Feasible** | Launcher restores `RemoteViews`, Glance state is in DataStore, WorkManager reschedules itself |
+| App Lock (biometric / screen lock) | **Feasible** | AndroidX Biometric with device-credential fallback; recents thumbnail hidden on API 33+ |
 | No root, no private data | **Satisfied** | Only plain files in shared storage, through user-granted SAF access |
 
 ## Platform support

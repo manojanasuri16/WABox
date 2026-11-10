@@ -33,6 +33,7 @@ com.wabox.app
 │   ├── media/               MediaSaver (MediaStore), ShareHelper, ThumbnailCache
 │   └── repo/                SourceRepository, StatusRepository, SavedRepository
 ├── work/                    RefreshWorker, SaveWorker, WorkScheduler
+├── security/                AppLock state machine + BiometricPrompt helper
 ├── widget/                  Glance widgets, receivers, actions, config activity, theme
 └── ui/
     ├── designsystem/        Tokens (color, type, spacing, shape, motion) + components
@@ -136,11 +137,11 @@ switches, dialogs) inherit the look.
 
 ## 8. Widgets
 
-| Widget | Sizes (responsive) | Data | Interactions |
+| Widget | Sizing | Data | Interactions |
 | --- | --- | --- | --- |
-| **Recent Statuses** | 2×2 (2×2 grid), 4×2 (4×1 / 4×2), 4×4 (3×3 / 4×3) | latest statuses for the configured source ("Follow app" or a fixed folder) | tile → viewer; save badge → `SaveWorker`; header → app |
-| **Sources** (account switcher) | 2×2, 4×1, 4×2 | status folders + counts + active marker | row → set active source + update all widgets; open app |
-| **Quick Access** | 1×1, 2×1, 2×2 | counts (new / photos / videos), last refresh | body → app; refresh glyph → `RefreshWorker` |
+| **Recent Statuses** | `SizeMode.Exact`: ~72 dp tiles fitted to the real size, 1–4 rows | latest statuses for the configured source ("Follow app" or a fixed folder) | tile → viewer; save badge → `SaveWorker`; header → app |
+| **Sources** (account switcher) | `SizeMode.Exact`: rows fitted to height | status folders + counts + active marker | row → set active source + update all widgets; open app |
+| **Quick Access** | `SizeMode.Exact`: compact row under 100 dp tall, card otherwise | counts (new / photos / videos), last refresh | body → app; refresh glyph → `RefreshWorker` |
 
 - Thumbnails come from `ThumbnailCache` (`cacheDir/widget_thumbs/<statusId>.jpg`, ≤ 320 px,
   JPEG q85). It is written during discovery for the newest 24 items and pruned as
@@ -149,8 +150,24 @@ switches, dialogs) inherit the look.
   `cornerRadius`; on API 29–30 they use rounded drawables.
 - Per-widget state: `PreferencesGlanceStateDefinition` (source selection).
 - `updatePeriodMillis = 0`: updates are event-driven only.
+- `SizeMode.Exact` rather than `Responsive`. Testing showed that when a launcher reports a size shorter
+  than every responsive bucket, Glance falls back to the smallest bucket and leaves most of the widget empty.
+- With App Lock on, the Recent widget shows "Protected by App Lock" instead of thumbnails.
 
-## 9. Error and permission model
+## 9. App Lock
+
+- `AppLock` observes the process lifecycle. It locks on cold start and when the app returns from the
+  background after more than the chosen timeout (instantly, 1, 5 or 15 min).
+- `MainActivity` (a `FragmentActivity`, for BiometricPrompt) draws an opaque `LockScreen` **over** the nav
+  host instead of removing it. Pending activity results (folder picker, delete consent) still land, and
+  nothing behind the lock is visible or touchable.
+- Authenticators: `BIOMETRIC_STRONG | DEVICE_CREDENTIAL` on API 30+, `BIOMETRIC_WEAK | DEVICE_CREDENTIAL`
+  on API 29 (STRONG + credential is unsupported there). Turning the lock on or off requires authenticating.
+- `setRecentsScreenshotEnabled(false)` hides the recents thumbnail on API 33+.
+- If the device's screen lock is removed, App Lock turns itself off with an explicit message rather than
+  trapping the user.
+
+## 10. Error and permission model
 
 `SourceHealth` is recomputed on every refresh:
 - `ACCESS_LOST`: the URI is no longer in `persistedUriPermissions`, or the query throws
@@ -161,7 +178,7 @@ switches, dialogs) inherit the look.
 - The viewer handles a status deleted while open with the "No longer available on this
   device" state.
 
-## 10. Technology decisions
+## 11. Technology decisions
 
 | Decision | Choice | Alternatives considered |
 | --- | --- | --- |
@@ -175,5 +192,6 @@ switches, dialogs) inherit the look.
 | Widgets | Glance 1.1.1 | RemoteViews XML: far more code for responsive layouts |
 | Background | WorkManager 2.10.0 | AlarmManager/JobScheduler direct: reinvents WorkManager |
 | Navigation | Navigation Compose 2.8.5 type-safe | Hand-rolled: loses back stack and deep links |
+| Auth | AndroidX Biometric 1.1.0 | Custom PIN: weaker, and duplicates the device lock |
 
 No `INTERNET` permission. No analytics. No ads SDK.

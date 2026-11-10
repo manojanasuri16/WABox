@@ -11,15 +11,19 @@ Phases follow the requested sequence. Each phase ends with a green `./gradlew as
 | 2 | Feasibility | `TECHNICAL_FEASIBILITY.md` | ✅ |
 | 3 | Architecture | `ARCHITECTURE.md`, this plan | ✅ |
 | 4 | Apple-design review | Principles mapped to Android (below) | ✅ |
-| 5 | Design system | Tokens, theme, core components | builds |
-| 6 | Navigation and screens | Scaffold, bottom bar, routes, onboarding shell | builds, launches |
-| 7 | Media discovery | Room, locator, scanner, repository, live observer | unit tests + emulator scan |
-| 8 | Sources/accounts | Grant manager, switcher sheet, labels, health, reconnect | emulator grant flow |
-| 9 | Viewer and saving | Pager, zoom, Media3, MediaSaver, share, dedupe | emulator save/share |
-| 10 | Saved gallery | Tabs, sort, selection, delete, reconciliation | emulator |
-| 11 | Widgets | Three Glance widgets, config activity, workers, thumbnail cache | emulator placement/resize |
-| 12 | Settings | Theme, save location, sources, refresh, about | emulator |
-| 13 | Test and polish | Unit tests, emulator end-to-end, light/dark screenshots, release APK | APK built |
+| 5 | Design system | Tokens, theme, core components | ✅ |
+| 6 | Navigation and screens | Scaffold, bottom bar, routes, onboarding shell | ✅ |
+| 7 | Media discovery | Room, locator, scanner, repository, live observer | ✅ |
+| 8 | Sources/accounts | Grant manager, switcher sheet, labels, health, reconnect | ✅ |
+| 9 | Viewer and saving | Pager, zoom, Media3, MediaSaver, share, dedupe | ✅ |
+| 10 | Saved gallery | Tabs, sort, selection, delete, reconciliation | ✅ |
+| 11 | Widgets | Three Glance widgets, config activity, workers, thumbnail cache | ✅ |
+| 12 | Settings | Theme, save location, sources, refresh, about | ✅ |
+| 13 | Test and polish | Unit tests, emulator end-to-end, light/dark screenshots, release APK | ✅ |
+
+| 14 | App Lock (requested later) | Biometric gate, timeouts, widget privacy | ✅ |
+
+Results: see [TESTING.md](TESTING.md).
 
 ## Apple-design principles → WABox (phase 4)
 
