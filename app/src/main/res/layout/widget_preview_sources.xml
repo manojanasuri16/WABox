@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical" android:padding="12dp" android:background="@drawable/widget_bg">
+    <LinearLayout android:layout_width="match_parent" android:layout_height="40dp" android:orientation="horizontal" android:gravity="center_vertical" android:paddingStart="8dp" android:paddingEnd="8dp" android:background="@drawable/widget_selected_bg">
+        <ImageView android:layout_width="22dp" android:layout_height="22dp" android:src="@drawable/ic_w_chat" android:background="@drawable/widget_kind_whatsapp" android:padding="4dp" android:importantForAccessibility="no"/>
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:layout_marginStart="10dp" android:text="WhatsApp" android:textColor="@color/widget_label" android:textSize="14sp"/>
+    </LinearLayout>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="40dp" android:orientation="horizontal" android:gravity="center_vertical" android:paddingStart="8dp" android:paddingEnd="8dp" android:background="@android:color/transparent">
+        <ImageView android:layout_width="22dp" android:layout_height="22dp" android:src="@drawable/ic_w_business" android:background="@drawable/widget_kind_business" android:padding="4dp" android:importantForAccessibility="no"/>
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:layout_marginStart="10dp" android:text="WhatsApp Business" android:textColor="@color/widget_label" android:textSize="14sp"/>
+    </LinearLayout>
+    <LinearLayout android:layout_width="match_parent" android:layout_height="40dp" android:orientation="horizontal" android:gravity="center_vertical" android:paddingStart="8dp" android:paddingEnd="8dp" android:background="@android:color/transparent">
+        <ImageView android:layout_width="22dp" android:layout_height="22dp" android:src="@drawable/ic_w_layers" android:background="@drawable/widget_kind_other" android:padding="4dp" android:importantForAccessibility="no"/>
+        <TextView android:layout_width="0dp" android:layout_weight="1" android:layout_height="wrap_content" android:layout_marginStart="10dp" android:text="All sources" android:textColor="@color/widget_label" android:textSize="14sp"/>
+    </LinearLayout>
+</LinearLayout>

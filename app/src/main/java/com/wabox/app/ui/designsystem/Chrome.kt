@@ -73,7 +73,6 @@ fun CompactTopBar(
     Column(
         modifier
             .fillMaxWidth()
-            .graphicsLayer { }
             .background(c.chrome.copy(alpha = c.chrome.alpha * progress))
             .windowInsetsPadding(WindowInsets.statusBars)
     ) {
@@ -99,8 +98,13 @@ fun CompactTopBar(
 
 /** The large title that scrolls with content, underneath the compact bar. */
 @Composable
-fun LargeTitle(title: String, modifier: Modifier = Modifier, subtitle: String? = null) {
-    Column(modifier.padding(horizontal = WaSpace.gutter).padding(top = WaSpace.xs, bottom = WaSpace.md)) {
+fun LargeTitle(
+    title: String,
+    modifier: Modifier = Modifier,
+    subtitle: String? = null,
+    horizontalPadding: androidx.compose.ui.unit.Dp = WaSpace.gutter,
+) {
+    Column(modifier.padding(horizontal = horizontalPadding).padding(top = WaSpace.xs, bottom = WaSpace.md)) {
         Text(title, style = Wa.type.largeTitle, color = Wa.colors.label)
         if (subtitle != null) {
             Spacer(Modifier.height(2.dp))

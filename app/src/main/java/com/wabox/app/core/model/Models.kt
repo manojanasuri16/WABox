@@ -31,6 +31,7 @@ enum class BackgroundRefresh(val hours: Long) {
 data class Source(
     val id: Long,
     val treeUri: String,
+    val rootDocumentId: String,
     val appKind: AppKind,
     val displayPath: String,
     val health: SourceHealth,

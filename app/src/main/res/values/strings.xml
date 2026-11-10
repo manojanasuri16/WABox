@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">WABox</string>
+    <string name="widget_recent_name">Recent statuses</string>
+    <string name="widget_recent_desc">Your newest statuses, with one-tap save</string>
+    <string name="widget_sources_name">Account switcher</string>
+    <string name="widget_sources_desc">Switch between WhatsApp, WhatsApp Business and other status folders</string>
+    <string name="widget_quick_name">Quick access</string>
+    <string name="widget_quick_desc">Status counts and a refresh button</string>
+</resources>

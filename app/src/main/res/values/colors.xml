@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="splash_background">#FFFFFFFF</color>
+    <color name="brand_accent">#FF3159F5</color>
+    <!-- Widget palette (day). Night values in values-night. -->
+    <color name="widget_bg">#FFFFFFFF</color>
+    <color name="widget_tile">#FFF0F0F3</color>
+    <color name="widget_label">#FF0B0B0F</color>
+    <color name="widget_secondary">#FF6E6E73</color>
+    <color name="widget_accent">#FF3159F5</color>
+    <color name="widget_separator">#1F3C3C43</color>
+    <color name="widget_selected">#143159F5</color>
+</resources>

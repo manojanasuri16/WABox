@@ -181,7 +181,7 @@ class SourceRepository(
     }
 }
 
-fun SourceEntity.toModel() = Source(id, treeUri, appKind, displayPath, health, lastScanAt)
+fun SourceEntity.toModel() = Source(id, treeUri, rootDocumentId, appKind, displayPath, health, lastScanAt)
 
 fun FolderRow.toModel() = StatusFolder(
     id = folder.id,

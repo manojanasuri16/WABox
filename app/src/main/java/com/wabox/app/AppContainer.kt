@@ -44,4 +44,15 @@ class AppContainer(private val context: Context) {
     }
 
     suspend fun updateWidgets() = WidgetUpdater.updateAll(context)
+
+    /** Persists a picked tree, discovers its status folders, scans, and reports the outcome. */
+    suspend fun connectSource(treeUri: android.net.Uri, reconnectSourceId: Long?): com.wabox.app.core.model.AddSourceResult {
+        val result = sourceRepository.addFromTree(treeUri, reconnectSourceId)
+        messages.post(com.wabox.app.ui.feedbackText(result))
+        if (result is com.wabox.app.core.model.AddSourceResult.Added || result is com.wabox.app.core.model.AddSourceResult.Reconnected ||
+            result is com.wabox.app.core.model.AddSourceResult.AlreadyConnected) {
+            statusRepository.refresh(force = true)
+        }
+        return result
+    }
 }
