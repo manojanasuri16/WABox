@@ -1,0 +1,24 @@
+{
+  "slug": "wabox",
+  "kind": "android",
+  "name": "WABox",
+  "tagline": "Every status. Every account. One place. Save WhatsApp statuses you've viewed, privately and offline.",
+  "category": "Utilities",
+  "developer": "Manoj Anasuri",
+  "accentColor": "#3159F5",
+  "packageName": "com.wabox.app",
+  "repo": "manojanasuri16/WABox",
+  "visibility": "public",
+  "screenshots": [
+    "appdrop/screenshots/01-welcome.png",
+    "appdrop/screenshots/02-home_settled.png",
+    "appdrop/screenshots/03-viewer_video.png",
+    "appdrop/screenshots/04-info.png",
+    "appdrop/screenshots/05-home_dark.png",
+    "appdrop/screenshots/06-bg_refresh.png",
+    "appdrop/screenshots/07-lock_on.png",
+    "appdrop/screenshots/08-locked.png"
+  ],
+  "icon": "appdrop/icon.png",
+  "descriptionFile": "appdrop/description.md"
+}
