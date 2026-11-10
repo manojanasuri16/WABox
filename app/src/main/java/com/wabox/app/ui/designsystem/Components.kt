@@ -145,7 +145,7 @@ fun WaButton(
             .clip(RoundedCornerShape(if (compact) 18.dp else WaRadius.md))
             .background(container.copy(alpha = if (enabled) container.alpha else container.alpha * 0.4f))
             .pressable(enabled = enabled && !loading, onClick = onClick)
-            .padding(horizontal = if (compact) 14.dp else WaSpace.xl),
+            .padding(horizontal = if (style == ButtonStyle.Plain) 0.dp else if (compact) 14.dp else WaSpace.xl),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
     ) {

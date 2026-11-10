@@ -31,6 +31,7 @@ data class AppSettings(
     val lastSeenAt: Long = 0L,
     val lastRefreshAt: Long = 0L,
     val widgetRefreshing: Boolean = false,
+    val lastStoppedAt: Long = 0L,
 )
 
 class SettingsRepository(context: Context) {
@@ -48,6 +49,7 @@ class SettingsRepository(context: Context) {
         val lastSeen = longPreferencesKey("last_seen_at")
         val lastRefresh = longPreferencesKey("last_refresh_at")
         val widgetRefreshing = booleanPreferencesKey("widget_refreshing")
+        val lastStopped = longPreferencesKey("last_stopped_at")
     }
 
     private inline fun <reified E : Enum<E>> Preferences.enum(key: Preferences.Key<String>, default: E): E =
@@ -66,6 +68,7 @@ class SettingsRepository(context: Context) {
             lastSeenAt = p[Keys.lastSeen] ?: 0L,
             lastRefreshAt = p[Keys.lastRefresh] ?: 0L,
             widgetRefreshing = p[Keys.widgetRefreshing] ?: false,
+            lastStoppedAt = p[Keys.lastStopped] ?: 0L,
         )
     }.distinctUntilChanged()
 
@@ -84,4 +87,5 @@ class SettingsRepository(context: Context) {
     suspend fun setLastSeen(at: Long) = store.edit { it[Keys.lastSeen] = at }
     suspend fun setLastRefresh(at: Long) = store.edit { it[Keys.lastRefresh] = at }
     suspend fun setWidgetRefreshing(value: Boolean) = store.edit { it[Keys.widgetRefreshing] = value }
+    suspend fun setLastStopped(at: Long) = store.edit { it[Keys.lastStopped] = at }
 }

@@ -158,14 +158,14 @@ private fun Connect(onDone: () -> Unit) {
                 AppCard(
                     kind = kind,
                     status = when {
-                        source == null && !installed -> "Not installed"
+                        source == null && !installed -> "Not detected on this device"
                         source == null -> "Not connected"
                         source.health == SourceHealth.OK -> "Connected"
                         source.health == SourceHealth.NO_STATUS_FOLDER -> "Connected · no statuses yet"
                         else -> "Access lost"
                     },
                     connected = source != null && source.health != SourceHealth.ACCESS_LOST,
-                    enabled = installed || source != null,
+                    enabled = true,
                     onConnect = { picker.connect(kind) },
                 )
                 Spacer(Modifier.height(WaSpace.md))

@@ -235,15 +235,18 @@ fun HomeScreen(
 
 @Composable
 private fun RefreshButton(refreshing: Boolean, enabled: Boolean, onClick: () -> Unit) {
-    val transition = rememberInfiniteTransition(label = "spin")
-    val angle by transition.animateFloat(0f, 360f, infiniteRepeatable(tween(900, easing = LinearEasing), RepeatMode.Restart), label = "angle")
+    // The infinite transition only exists while refreshing, so an idle Home renders no frames.
+    val rotation = if (refreshing) {
+        val transition = rememberInfiniteTransition(label = "spin")
+        transition.animateFloat(0f, 360f, infiniteRepeatable(tween(900, easing = LinearEasing), RepeatMode.Restart), label = "angle").value
+    } else 0f
     IconCircleButton(
         icon = Icons.Rounded.Refresh,
         contentDescription = if (refreshing) "Refreshing" else "Refresh",
         onClick = onClick,
         enabled = enabled && !refreshing,
         tint = Wa.colors.accent,
-        modifier = Modifier.graphicsLayer { rotationZ = if (refreshing) angle else 0f },
+        modifier = Modifier.graphicsLayer { rotationZ = rotation },
     )
 }
 

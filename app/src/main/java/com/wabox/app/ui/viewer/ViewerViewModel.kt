@@ -176,7 +176,9 @@ class ViewerViewModel(private val c: AppContainer, handle: SavedStateHandle) : V
         _info.value = baseInfo(item)
         viewModelScope.launch {
             val dims = withContext(Dispatchers.IO) { MediaProbe.dimensions(context, Uri.parse(item.uri), item.isVideo) }
-            if (dims != null) _info.update { rows -> rows?.let { it + InfoRow("Dimensions", "${dims.width} × ${dims.height}") } }
+            if (dims != null) _info.update { rows ->
+                rows?.toMutableList()?.apply { add(2.coerceAtMost(size), InfoRow("Dimensions", "${dims.width} × ${dims.height}")) }
+            }
         }
     }
 
@@ -187,7 +189,8 @@ class ViewerViewModel(private val c: AppContainer, handle: SavedStateHandle) : V
         add(InfoRow("Size", Formats.size(item.size)))
         item.durationMs?.takeIf { it > 0 }?.let { add(InfoRow("Duration", Formats.duration(it))) }
         add(InfoRow(if (mode == ViewerMode.SAVED) "Saved" else "Posted", Formats.dateTime(item.timestamp)))
-        add(InfoRow("Source", "${item.sourceLabel} (${appName(item.appKind)})"))
+        val app = appName(item.appKind)
+        add(InfoRow("Source", if (item.sourceLabel == app || item.appKind == AppKind.OTHER) item.sourceLabel else "${item.sourceLabel} · $app"))
         add(InfoRow("File", item.name))
     }
 }

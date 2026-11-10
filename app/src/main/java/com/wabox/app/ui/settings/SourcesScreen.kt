@@ -108,9 +108,9 @@ fun SourcesScreen(onBack: () -> Unit) {
                     val installed = container.grants.isInstalled(kind)
                     GroupedRow(
                         title = "Connect ${appName(kind)}",
-                        subtitle = if (installed) "Opens the picker at Android › media › ${if (kind == AppKind.WHATSAPP) "com.whatsapp" else "com.whatsapp.w4b"}" else "Not installed on this device",
+                        subtitle = if (installed) "Opens the picker at Android › media › ${if (kind == AppKind.WHATSAPP) "com.whatsapp" else "com.whatsapp.w4b"}" else "Not detected on this device. You can still choose its folder.",
                         leading = { RowIcon(Icons.Rounded.Add, c.tint(kind)) },
-                        titleColor = if (installed) c.accent else c.secondaryLabel,
+                        titleColor = c.accent,
                         onClick = { picker.connect(kind) },
                     )
                 }

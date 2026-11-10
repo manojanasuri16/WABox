@@ -52,6 +52,12 @@ class LiveStatusObserver(
     override fun onStart(owner: LifecycleOwner) {
         job?.cancel()
         job = scope.launch {
+            // A visit only ends after a real absence (persisted, so it survives process death).
+            // Round-trips to the system picker or share sheet must not turn everything into "Earlier".
+            val s = settings.current()
+            if (s.lastStoppedAt > s.lastSeenAt && System.currentTimeMillis() - s.lastStoppedAt > NEW_VISIT_AFTER_MS) {
+                settings.setLastSeen(s.lastStoppedAt)
+            }
             launch {
                 if (settings.current().refreshOnOpen) statusRepository.refresh(force = false)
             }
@@ -69,7 +75,8 @@ class LiveStatusObserver(
         job?.cancel()
         job = null
         closeAll()
-        scope.launch { settings.setLastSeen(System.currentTimeMillis()) }
+        val at = System.currentTimeMillis()
+        scope.launch { settings.setLastStopped(at) }
     }
 
     private suspend fun rearm(targets: List<Pair<Long, String>>) = withContext(Dispatchers.IO) {
@@ -105,5 +112,6 @@ class LiveStatusObserver(
     companion object {
         private const val TAG = "LiveStatusObserver"
         private const val DEBOUNCE_MS = 750L
+        private const val NEW_VISIT_AFTER_MS = 60_000L
     }
 }

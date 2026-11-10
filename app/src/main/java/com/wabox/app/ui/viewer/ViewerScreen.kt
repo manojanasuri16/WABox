@@ -48,8 +48,6 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ModalBottomSheet
-import androidx.compose.material3.Slider
-import androidx.compose.material3.SliderDefaults
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -70,6 +68,11 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.foundation.gestures.awaitEachGesture
+import androidx.compose.foundation.gestures.awaitFirstDown
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.text.font.FontWeight
@@ -325,12 +328,11 @@ private fun VideoControls(player: ExoPlayer) {
             container = Color.Transparent, tint = Color.White, size = 40.dp,
         )
         Text(Formats.duration(if (scrubbing) (scrub * duration).toLong() else position), style = Wa.type.caption, color = Color.White, modifier = Modifier.width(40.dp))
-        Slider(
-            value = if (scrubbing) scrub else if (duration > 0) position.toFloat() / duration else 0f,
-            onValueChange = { scrubbing = true; scrub = it },
-            onValueChangeFinished = { player.seekTo((scrub * duration).toLong()); scrubbing = false },
-            colors = SliderDefaults.colors(thumbColor = Color.White, activeTrackColor = Color.White, inactiveTrackColor = Color.White.copy(alpha = 0.3f)),
-            modifier = Modifier.weight(1f).height(32.dp),
+        Scrubber(
+            fraction = if (scrubbing) scrub else if (duration > 0) position.toFloat() / duration else 0f,
+            onScrub = { scrubbing = true; scrub = it },
+            onScrubEnd = { player.seekTo((scrub * duration).toLong()); scrubbing = false },
+            modifier = Modifier.weight(1f),
         )
         Spacer(Modifier.width(8.dp))
         Text(Formats.duration(duration), style = Wa.type.caption, color = Color.White.copy(alpha = 0.7f))
@@ -340,6 +342,39 @@ private fun VideoControls(player: ExoPlayer) {
             { muted = !muted; player.volume = if (muted) 0f else 1f },
             container = Color.Transparent, tint = Color.White, size = 40.dp,
         )
+    }
+}
+
+/**
+ * Slim scrubber: a 4 dp track that thickens while dragging. It tracks the finger 1:1 from
+ * touch-down, and the position commits on release.
+ */
+@Composable
+private fun Scrubber(fraction: Float, onScrub: (Float) -> Unit, onScrubEnd: () -> Unit, modifier: Modifier = Modifier) {
+    var active by remember { mutableStateOf(false) }
+    val thickness by androidx.compose.animation.core.animateDpAsState(if (active) 9.dp else 4.dp, WaMotion.snappy(), label = "scrub")
+    BoxWithConstraints(
+        modifier.height(32.dp)
+            .pointerInput(Unit) {
+                awaitEachGesture {
+                    val down = awaitFirstDown()
+                    active = true
+                    onScrub((down.position.x / size.width).coerceIn(0f, 1f))
+                    do {
+                        val e = awaitPointerEvent()
+                        val c = e.changes.first()
+                        onScrub((c.position.x / size.width).coerceIn(0f, 1f))
+                        c.consume()
+                    } while (c.pressed)
+                    active = false
+                    onScrubEnd()
+                }
+            }
+            .semantics { contentDescription = "Playback position" },
+        contentAlignment = Alignment.CenterStart,
+    ) {
+        Box(Modifier.fillMaxWidth().height(thickness).clip(RoundedCornerShape(50)).background(Color.White.copy(alpha = 0.28f)))
+        Box(Modifier.fillMaxWidth(fraction.coerceIn(0f, 1f)).height(thickness).clip(RoundedCornerShape(50)).background(Color.White))
     }
 }
 
