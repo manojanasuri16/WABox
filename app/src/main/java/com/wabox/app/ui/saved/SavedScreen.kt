@@ -148,7 +148,7 @@ fun SavedScreen(onOpen: (SavedItem, MediaFilter) -> Unit) {
                         },
                         onLongClick = { if (!state.selecting) { haptics.confirm(); vm.startSelection(item.id) } },
                         contentDescription = "Saved ${if (item.kind == MediaKind.VIDEO) "video" else "photo"} from ${item.originLabel}, ${Formats.relative(item.savedAt)}",
-                        modifier = Modifier.animateItem(),
+                        modifier = Modifier.animateItem(fadeInSpec = null),
                     )
                 }
             }

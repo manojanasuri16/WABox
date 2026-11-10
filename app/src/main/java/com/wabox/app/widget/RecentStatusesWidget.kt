@@ -6,7 +6,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import androidx.datastore.preferences.core.Preferences
 import androidx.glance.GlanceId
@@ -51,7 +50,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlin.math.floor
-import kotlin.math.max
 
 class RecentStatusesReceiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget = RecentStatusesWidget()
@@ -62,9 +60,7 @@ class RecentStatusesReceiver : GlanceAppWidgetReceiver() {
  * so rendering is cheap and works while the app process is cold.
  */
 class RecentStatusesWidget : GlanceAppWidget() {
-    override val sizeMode = SizeMode.Responsive(
-        setOf(DpSize(110.dp, 110.dp), DpSize(180.dp, 110.dp), DpSize(250.dp, 110.dp), DpSize(250.dp, 200.dp), DpSize(320.dp, 260.dp))
-    )
+    override val sizeMode: SizeMode = SizeMode.Exact
     override val stateDefinition: GlanceStateDefinition<*> = PreferencesGlanceStateDefinition
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
@@ -87,14 +83,16 @@ class RecentStatusesWidget : GlanceAppWidget() {
         val size = LocalSize.current
         val gap = 6.dp
         val padding = 12.dp
-        val columns = when {
-            size.width >= 300.dp -> 4
-            size.width >= 220.dp -> 4
-            size.width >= 170.dp -> 3
-            else -> 2
+        // Fit ~72 dp tiles to the real widget size (SizeMode.Exact), in both directions.
+        val innerW = size.width - padding * 2
+        val innerH = (size.height - padding * 2 - 30.dp).coerceAtLeast(40.dp)
+        var columns = floor(((innerW + gap) / (72.dp + gap))).toInt().coerceIn(2, 6)
+        var tile = (innerW - gap * (columns - 1)) / columns
+        if (tile > innerH) {
+            tile = innerH
+            columns = floor(((innerW + gap) / (tile + gap))).toInt().coerceIn(1, 8)
         }
-        val tile = (size.width - padding * 2 - gap * (columns - 1)) / columns
-        val rows = max(1, floor(((size.height - padding * 2 - 30.dp + gap) / (tile + gap))).toInt()).coerceAtMost(3)
+        val rows = floor(((innerH + gap) / (tile + gap))).toInt().coerceIn(1, 4)
         val limit = columns * rows
 
         val tiles by remember(folderId, limit) {
@@ -178,7 +176,7 @@ class RecentStatusesWidget : GlanceAppWidget() {
                     saving -> Box(GlanceModifier.size(22.dp).background(ImageProvider(R.drawable.widget_badge_dark)), contentAlignment = Alignment.Center) {
                         CircularProgressIndicator(GlanceModifier.size(14.dp), color = WColors.white)
                     }
-                    size >= 56.dp -> Box(
+                    size >= 44.dp -> Box(
                         GlanceModifier.size(26.dp).background(ImageProvider(R.drawable.widget_badge_dark))
                             .clickable(actionRunCallback<SaveStatusAction>(saveParams(item.id)))
                             .semantics { contentDescription = "Save" },

@@ -280,7 +280,7 @@ private fun LazyGridScope.tiles(
         onSave = { onSave(item) },
         sourceKind = if (state.showSourceBadges) item.appKind else null,
         contentDescription = "${if (item.kind == MediaKind.VIDEO) "Video" else "Photo"} from ${item.folderLabel}, ${Formats.relative(item.lastModified)}",
-        modifier = Modifier.animateItem(),
+        modifier = Modifier.animateItem(fadeInSpec = null),
     )
 }
 
