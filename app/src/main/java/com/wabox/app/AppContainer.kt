@@ -39,6 +39,7 @@ class AppContainer(private val context: Context) {
     val savedRepository by lazy {
         SavedRepository(context, database, MediaSaver(context, database.saved()), settings, ::updateWidgets)
     }
+    val appLock by lazy { com.wabox.app.security.AppLock(settings, appScope) }
     val liveObserver by lazy {
         LiveStatusObserver(context.contentResolver, database, statusRepository, settings, appScope)
     }

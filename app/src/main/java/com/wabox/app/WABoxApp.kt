@@ -17,6 +17,7 @@ class WABoxApp : Application(), SingletonImageLoader.Factory {
         super.onCreate()
         container = AppContainer(this)
         ProcessLifecycleOwner.get().lifecycle.addObserver(container.liveObserver)
+        ProcessLifecycleOwner.get().lifecycle.addObserver(container.appLock)
         container.appScope.launch {
             container.scheduler.applyBackgroundRefresh(container.settings.current().backgroundRefresh)
             // A refresh worker killed mid-run must not leave a widget spinner stuck forever.

@@ -23,6 +23,9 @@ enum class SaveLocation(val imagesPath: String, val videosPath: String) {
     DCIM("DCIM/WABox", "DCIM/WABox"),
 }
 
+/** How long WABox may sit in the background before App Lock asks again. */
+enum class LockTimeout(val millis: Long) { IMMEDIATELY(0), ONE_MINUTE(60_000), FIVE_MINUTES(300_000), FIFTEEN_MINUTES(900_000) }
+
 enum class BackgroundRefresh(val hours: Long) {
     OFF(0), HOURLY(1), EVERY_6_HOURS(6), EVERY_12_HOURS(12), DAILY(24)
 }

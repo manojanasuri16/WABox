@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.wabox.app.AppContainer
 import com.wabox.app.core.model.BackgroundRefresh
+import com.wabox.app.core.model.LockTimeout
 import com.wabox.app.core.model.SaveLocation
 import com.wabox.app.core.model.Source
 import com.wabox.app.core.model.StatusFolder
@@ -34,6 +35,18 @@ class SettingsViewModel(private val c: AppContainer) : ViewModel() {
     fun setSaveLocation(l: SaveLocation) = viewModelScope.launch { c.settings.setSaveLocation(l) }
     fun setRefreshOnOpen(v: Boolean) = viewModelScope.launch { c.settings.setRefreshOnOpen(v) }
     fun setLiveUpdates(v: Boolean) = viewModelScope.launch { c.settings.setLiveUpdates(v) }
+
+    /** Only called after the user has authenticated in the UI. */
+    fun setAppLock(enabled: Boolean) = viewModelScope.launch {
+        c.settings.setAppLock(enabled)
+        if (!enabled) c.appLock.disabled()
+        c.messages.post(if (enabled) "App Lock is on" else "App Lock is off", MessageTone.SUCCESS)
+        c.updateWidgets() // the Recent widget hides previews while App Lock is on
+    }
+
+    fun setLockTimeout(v: LockTimeout) = viewModelScope.launch { c.settings.setLockTimeout(v) }
+
+    fun postError(text: String) = c.messages.post(text, MessageTone.ERROR)
 
     fun setBackgroundRefresh(v: BackgroundRefresh) = viewModelScope.launch {
         c.settings.setBackgroundRefresh(v)

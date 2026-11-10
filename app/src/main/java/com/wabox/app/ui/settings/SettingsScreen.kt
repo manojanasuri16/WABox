@@ -39,6 +39,11 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.wabox.app.BuildConfig
 import com.wabox.app.core.model.BackgroundRefresh
+import com.wabox.app.core.model.LockTimeout
+import com.wabox.app.security.Biometrics
+import com.wabox.app.ui.viewer.findActivity
+import androidx.fragment.app.FragmentActivity
+import androidx.compose.material.icons.rounded.Lock
 import com.wabox.app.core.model.SaveLocation
 import com.wabox.app.core.model.SourceHealth
 import com.wabox.app.core.model.ThemeMode
@@ -97,6 +102,42 @@ fun SettingsScreen(onSources: () -> Unit, onAbout: () -> Unit) {
                     showChevron = true,
                     onClick = onSources,
                 )
+            }
+
+            GroupedSection(
+                header = "Privacy",
+                footer = if (s.appLock) "WABox asks for your fingerprint, face or screen lock when it opens. The Recent statuses widget hides previews while App Lock is on."
+                else "Require your fingerprint, face or screen lock to open WABox.",
+            ) {
+                ToggleRow("App Lock", "Unlock with biometrics or your screen lock", Icons.Rounded.Lock, Color(0xFF5856D6), s.appLock) { want ->
+                    val activity = context.findActivity() as? FragmentActivity ?: return@ToggleRow
+                    if (!Biometrics.canAuthenticate(activity)) {
+                        vm.postError("Set up a screen lock in Android settings first")
+                        context.startActivity(Intent(Settings.ACTION_SECURITY_SETTINGS).addFlags(Intent.FLAG_ACTIVITY_NEW_TASK))
+                        return@ToggleRow
+                    }
+                    // Both turning on and turning off require proving it's you.
+                    Biometrics.authenticate(
+                        activity,
+                        title = if (want) "Turn on App Lock" else "Turn off App Lock",
+                        subtitle = "Confirm it's you",
+                        onSuccess = { vm.setAppLock(want) },
+                        onError = { msg -> if (msg != null) vm.postError(msg) },
+                    )
+                }
+                if (s.appLock) {
+                    RowDivider()
+                    Column(Modifier.padding(WaSpace.lg)) {
+                        Text("Lock after leaving", style = Wa.type.body, color = c.label)
+                        Spacer(Modifier.height(WaSpace.md))
+                        SegmentedControl(
+                            options = listOf("Instantly", "1 min", "5 min", "15 min"),
+                            selectedIndex = s.lockTimeout.ordinal,
+                            onSelect = { vm.setLockTimeout(LockTimeout.entries[it]) },
+                            modifier = Modifier.fillMaxWidth(),
+                        )
+                    }
+                }
             }
 
             GroupedSection(header = "Appearance") {

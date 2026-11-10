@@ -76,6 +76,7 @@ class RecentStatusesWidget : GlanceAppWidget() {
         val active by c.settings.activeFolderId.collectAsState(initial = 0L)
         val folders by c.sourceRepository.folders.collectAsState(initial = null)
         val saving by c.savedRepository.saving.collectAsState()
+        val appLock by remember { c.settings.settings.map { it.appLock } }.collectAsState(initial = false)
         val requested = if (configured == FOLLOW_APP) active else configured
         val folder = folders?.firstOrNull { it.id == requested }
         val folderId = folder?.id ?: 0L
@@ -109,6 +110,7 @@ class RecentStatusesWidget : GlanceAppWidget() {
                 folders == null || list == null -> Box(GlanceModifier.fillMaxSize(), contentAlignment = Alignment.Center) {
                     CircularProgressIndicator(color = WColors.accent)
                 }
+                appLock -> Message("Protected by App Lock", "Open WABox to view your statuses.")
                 folders.orEmpty().isEmpty() -> Message("Connect WhatsApp", "Open WABox to grant folder access.")
                 list.isEmpty() -> Message("No statuses yet", "View statuses in WhatsApp, then refresh.", showRefresh = true)
                 else -> Grid(list, columns, rows, tile, gap, saving)

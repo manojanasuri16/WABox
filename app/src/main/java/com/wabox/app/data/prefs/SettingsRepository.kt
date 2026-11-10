@@ -9,6 +9,7 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import com.wabox.app.core.model.BackgroundRefresh
+import com.wabox.app.core.model.LockTimeout
 import com.wabox.app.core.model.SaveLocation
 import com.wabox.app.core.model.SortOrder
 import com.wabox.app.core.model.ThemeMode
@@ -32,6 +33,8 @@ data class AppSettings(
     val lastRefreshAt: Long = 0L,
     val widgetRefreshing: Boolean = false,
     val lastStoppedAt: Long = 0L,
+    val appLock: Boolean = false,
+    val lockTimeout: LockTimeout = LockTimeout.ONE_MINUTE,
 )
 
 class SettingsRepository(context: Context) {
@@ -50,6 +53,8 @@ class SettingsRepository(context: Context) {
         val lastRefresh = longPreferencesKey("last_refresh_at")
         val widgetRefreshing = booleanPreferencesKey("widget_refreshing")
         val lastStopped = longPreferencesKey("last_stopped_at")
+        val appLock = booleanPreferencesKey("app_lock")
+        val lockTimeout = stringPreferencesKey("lock_timeout")
     }
 
     private inline fun <reified E : Enum<E>> Preferences.enum(key: Preferences.Key<String>, default: E): E =
@@ -69,6 +74,8 @@ class SettingsRepository(context: Context) {
             lastRefreshAt = p[Keys.lastRefresh] ?: 0L,
             widgetRefreshing = p[Keys.widgetRefreshing] ?: false,
             lastStoppedAt = p[Keys.lastStopped] ?: 0L,
+            appLock = p[Keys.appLock] ?: false,
+            lockTimeout = p.enum(Keys.lockTimeout, LockTimeout.ONE_MINUTE),
         )
     }.distinctUntilChanged()
 
@@ -87,5 +94,7 @@ class SettingsRepository(context: Context) {
     suspend fun setLastSeen(at: Long) = store.edit { it[Keys.lastSeen] = at }
     suspend fun setLastRefresh(at: Long) = store.edit { it[Keys.lastRefresh] = at }
     suspend fun setWidgetRefreshing(value: Boolean) = store.edit { it[Keys.widgetRefreshing] = value }
+    suspend fun setAppLock(enabled: Boolean) = store.edit { it[Keys.appLock] = enabled }
+    suspend fun setLockTimeout(value: LockTimeout) = store.edit { it[Keys.lockTimeout] = value.name }
     suspend fun setLastStopped(at: Long) = store.edit { it[Keys.lastStopped] = at }
 }

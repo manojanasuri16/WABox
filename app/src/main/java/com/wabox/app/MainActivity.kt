@@ -3,7 +3,6 @@ package com.wabox.app
 import android.content.Intent
 import android.graphics.Color
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -12,6 +11,15 @@ import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.fragment.app.FragmentActivity
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.ui.Modifier
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
+import com.wabox.app.ui.MessageTone
+import com.wabox.app.ui.lock.LockScreen
+import kotlinx.coroutines.launch
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.wabox.app.ui.LocalAppContainer
 import com.wabox.app.ui.designsystem.WaTheme
@@ -19,7 +27,8 @@ import com.wabox.app.ui.designsystem.isDarkTheme
 import com.wabox.app.ui.navigation.WaNavHost
 import kotlinx.coroutines.flow.MutableStateFlow
 
-class MainActivity : ComponentActivity() {
+/** FragmentActivity (a ComponentActivity) because BiometricPrompt needs one. */
+class MainActivity : FragmentActivity() {
     private val pendingStatusId = MutableStateFlow<String?>(null)
     @Volatile private var ready = false
 
@@ -33,8 +42,15 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val settings by container.settings.settings.collectAsStateWithLifecycle(initialValue = null)
+            val locked by container.appLock.locked.collectAsStateWithLifecycle()
             val s = settings ?: return@setContent
+            val isLocked = locked ?: return@setContent
             ready = true
+            val scope = rememberCoroutineScope()
+            // With App Lock on, keep app content out of the recents thumbnail (API 33+).
+            LaunchedEffect(s.appLock) {
+                if (android.os.Build.VERSION.SDK_INT >= 33) setRecentsScreenshotEnabled(!s.appLock)
+            }
             val startWithOnboarding = remember { !s.onboardingDone }
             val dark = isDarkTheme(s.themeMode)
             DisposableEffect(dark) {
@@ -46,7 +62,21 @@ class MainActivity : ComponentActivity() {
             }
             WaTheme(dark = dark) {
                 CompositionLocalProvider(LocalAppContainer provides container) {
-                    WaNavHost(startWithOnboarding, pendingStatusId, onConsumedStatus = { pendingStatusId.value = null })
+                    Box(Modifier.fillMaxSize()) {
+                        WaNavHost(startWithOnboarding, pendingStatusId, onConsumedStatus = { pendingStatusId.value = null })
+                        if (isLocked && s.appLock) {
+                            LockScreen(
+                                onUnlocked = container.appLock::unlock,
+                                onNoScreenLock = {
+                                    scope.launch {
+                                        container.settings.setAppLock(false)
+                                        container.appLock.disabled()
+                                        container.messages.post("App Lock turned off: this device no longer has a screen lock", MessageTone.ERROR)
+                                    }
+                                },
+                            )
+                        }
+                    }
                 }
             }
         }
