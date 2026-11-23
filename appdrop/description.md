@@ -16,6 +16,8 @@ WABox keeps the WhatsApp and WhatsApp Business statuses you've viewed in one cal
 - No internet permission and no ads. Nothing leaves your phone.
 - No root and no "All files access". You grant only the WhatsApp folder, through Android's own file picker.
 
+**Open source:** the full source code is public at https://github.com/manojanasuri16/WABox
+
 **Requirements:** Android 10 to 16.
 
 **Good to know:** only statuses WhatsApp has already downloaded (usually the ones you've viewed) can be shown. Two accounts inside a single WhatsApp app can be shown separately only if WhatsApp stores them in different folders.

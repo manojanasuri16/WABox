@@ -8,6 +8,10 @@ widgets, an optional App Lock, and no internet permission.
 
 > WABox is an independent app. It isn't affiliated with, endorsed by, or sponsored by WhatsApp or Meta.
 
+## Source
+
+WABox is open to read: the full source is in this repository. It's a single-module Kotlin and Jetpack Compose app with no network code. See [Build from source](#build-from-source) and [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md). Also listed on AppDrop.
+
 ## Download
 
 Grab the latest signed APK from **[Releases](../../releases)** and install it. You may need to allow
